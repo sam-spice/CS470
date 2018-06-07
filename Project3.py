@@ -5,20 +5,20 @@ class BayesianNetwork:
     def __init__(self, micro_loan):
         self.micro_loan = micro_loan
         if self.micro_loan:
-            self.business = .8
+            self.business = .5
             self.debt = 1 - self.business + .01
 
         else:
             self.debt = .001
-            self.business = .1
+            self.business = .2
 
         self.job_giv_b = .7
         self.job_giv_not_b = .001
-        self.w_dict = {'TrueTrueTrue':      .6,
-                       'TrueTrueFalse':     .95,
+        self.w_dict = {'TrueTrueTrue':      .5,
+                       'TrueTrueFalse':     .9,
                        'TrueFalseTrue':     .005,
-                       'TrueFalseFalse':    .6,
-                       'FalseTrueTrue':     .7,
+                       'TrueFalseFalse':    .5,
+                       'FalseTrueTrue':     .4,
                        'FalseTrueFalse':    .95,
                        'FalseFalseTrue':    .0001,
                        'FalseFalseFalse':   .01}
@@ -98,9 +98,9 @@ def calc_prob_poverty(bayes_net):
 def local_search(loan, no_loan):
     prob_pov_no_loan = calc_prob_poverty(no_loan)
     rate_of_change = .001
-    max_count = 1200
+    max_count = 1800
     altered = True
-    list_of_var = ['debt', 'job_giv_b', 'job_giv_not_b']
+    list_of_var = [ 'debt', 'job_giv_b', 'job_giv_not_b']
     count = 0
     while altered and count < max_count:
         count += 1
@@ -142,7 +142,7 @@ def calc_new_var(loan, prob_pov_no_loan, rate_of_change, attr):
     return altered
 
 
-def main():
+def temp():
     loan = BayesianNetwork(True)
     no_loan = BayesianNetwork(False)
     print('Prob of P(W | M) = ' + str(calc_prob_poverty(loan)))
@@ -153,5 +153,35 @@ def main():
     loan.print_network_param()
     no_loan.print_network_param()
 
+def main():
+    loop = True
+    loan = BayesianNetwork(True)
+    no_loan = BayesianNetwork(False)
+    while loop:
+        print('Menu:\n1: change business\n2: change debt\n3: change job w/o biz\n4: change job w/ biz\n5: reset Val'
+              '\n6: Local Search')
+        choice = int(input('Choice: '))
+        if choice == 1:
+            new_val = float(input('New Val: '))
+            loan.set_business(new_val)
+        elif choice == 2:
+            new_val = float(input('New Val: '))
+            loan.set_debt(new_val)
+        elif choice == 3:
+            new_val = float(input('New Val: '))
+            loan.set_job_giv_not_b(new_val)
+        elif choice == 4:
+            new_val = float(input('New Val: '))
+            loan.set_job_giv_b(new_val)
+        elif choice == 5:
+            loan = BayesianNetwork(True)
+        elif choice == 6:
+            local_search(loan, no_loan)
+        else:
+            print('menu error')
+        loan.print_network_param()
+        no_loan.print_network_param()
+        print('Prob of P(W | M) = ' + str(calc_prob_poverty(loan)))
+        print('Prob of P(W |!M) = ' + str(calc_prob_poverty(no_loan)))
 
 main()
